@@ -1,0 +1,18 @@
+-- EXPERIMENT4
+
+-- 1
+select dept_name from instructor group by dept_name
+having sum(salary) > (select avg(total_salary) from (select dept_name, sum(salary) as total_salary from instructor group by dept_name) as dept_salary_avg);
+
+-- 2
+select name,course_id from instructor join teaches on instructor.Id = teaches.Id;
+
+-- 3
+select instructor.name, coalesce(teaches.course_id, 'null') as course_id from instructor left join teaches on instructor.Id = teaches.Id;
+
+-- 4
+create VIEW faculty as select Id, name, dept_name from instructor;
+select *from faculty;
+
+-- 5
+-- grant select on faculty to new_user;
