@@ -1,0 +1,475 @@
+CREATE TABLE Instructor (
+  ID INTEGER PRIMARY KEY,
+  name TEXT ,
+  dept_name TEXT ,
+  salary INTEGER
+);
+
+-- insert
+INSERT INTO Instructor VALUES (0001, 'sukindar Sing', 'History', 100000);
+INSERT INTO Instructor VALUES (0002, 'akash', 'History', 90000);
+INSERT INTO Instructor VALUES (0003, 'sridar', 'Physics', 90000);
+INSERT INTO Instructor VALUES (0004, 'monish', 'Chemistry', 80000);
+INSERT INTO Instructor VALUES (0005, 'guru', 'Physics', 100000);
+
+-- create
+CREATE TABLE Teaches (
+  ID INTEGER ,
+  Course_Id VARCHAR(255) ,
+  Sec_Id INTEGER ,
+  semester TEXT ,
+  year INTEGER,
+  FOREIGN KEY (ID) REFERENCES Instructor(ID)
+);
+-- (currently there is no PRIMARY KEY for Teaches relation)
+
+-- insert
+INSERT INTO Teaches VALUES (0001, 'HIS-01', 1, 'fall', 2017);
+INSERT INTO Teaches VALUES (0001, 'HIS-11', 1, 'Spring', 2018);
+INSERT INTO Teaches VALUES (0002, 'HIS-11', 1, 'fall', 2017);
+INSERT INTO Teaches VALUES (0003, 'PHY-01', 2, 'Summer', 2018);
+INSERT INTO Teaches VALUES (0003, 'PHY-02', 2, 'fall', 2018);
+INSERT INTO Teaches VALUES (0004, 'CHE-11', 3, 'Spring', 2018);
+INSERT INTO Teaches VALUES (0005, 'PHY-11', 3, 'Summer', 2017);
+-- (given inter datatype for the year)
+
+SELECT * FROM Instructor ;
+SELECT * FROM Teaches ;
+
+-- Query3
+INSERT INTO Instructor VALUES (0006, 'Smith', 'Biology', 66000);
+SELECT * FROM Instructor ;
+
+-- Query4
+DELETE FROM Instructor
+WHERE ID=0006;
+SELECT * FROM Instructor ;
+
+-- Query5
+SELECT * FROM Instructor
+WHERE dept_name='History';
+
+-- Query6
+SELECT *
+FROM Instructor
+CROSS JOIN Teaches;
+-- (give different name for ID values in 2 TABLE while selecting)
+
+-- Query7
+SELECT Instructor.name, Teaches.Course_Id
+FROM Instructor
+CROSS JOIN Teaches;
+-- (currently no features to manage the null values)
+
+-- Query8
+SELECT *
+FROM Instructor
+WHERE name LIKE '%dar%';
+
+-- Query9
+SELECT name
+FROM Instructor
+WHERE salary BETWEEN 90000 AND 100000;
+
+
+
+
+
+-- Qn2
+
+-- Query1
+SELECT *
+FROM Instructor
+ORDER BY salary DESC;
+
+-- Query2
+SELECT Course_Id
+FROM Teaches
+WHERE (semester = 'fall' AND year = 2017)
+   OR (semester = 'Spring' AND year = 2018);
+   
+
+-- Query3
+SELECT Course_Id
+FROM Teaches AS t1
+WHERE semester = 'fall' AND year = 2017
+AND EXISTS (
+    SELECT 1
+    FROM Teaches AS t2
+    WHERE t1.Course_Id = t2.Course_Id
+      AND t2.semester = 'Spring' AND t2.year = 2018
+);
+
+-- Query4
+SELECT Course_Id
+FROM Teaches
+WHERE semester = 'fall' AND year = 2017
+AND Course_Id NOT IN (
+    SELECT Course_Id
+    FROM Teaches
+    WHERE semester = 'Spring' AND year = 2018
+);
+-- (check)
+
+-- Query5
+INSERT INTO Instructor VALUES (10211, 'Smith', 'Biology', 66000);
+INSERT INTO Instructor VALUES (10212, 'Tom', 'Biology', null);
+SELECT * FROM Instructor ;
+
+-- Query6
+SELECT * FROM Instructor
+WHERE salary IS NULL;
+
+-- Query7
+SELECT AVG(salary) AS average_salary
+FROM Instructor
+WHERE dept_name = 'History';
+
+
+
+
+
+-- Qn3
+
+-- Query1
+SELECT COUNT(DISTINCT ID) AS unique_id_count
+FROM Teaches
+WHERE semester = 'Spring' AND year = 2018;
+-- (check)
+
+-- Query2
+SELECT COUNT(*) AS unique_id_count
+FROM Teaches;
+-- (check)
+
+-- Query3
+SELECT dept_name, AVG(salary) AS average_salary
+FROM Instructor
+GROUP BY dept_name;
+
+-- Query4
+SELECT dept_name, AVG(salary) AS average_salary
+FROM Instructor
+GROUP BY dept_name
+HAVING AVG(salary) > 42000;
+
+-- Query5 
+SELECT name FROM INSTRUCTOR WHERE name NOT IN ('Mozart', 'Einstein');
+-- query6
+SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ANY (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
+-- query7
+SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ALL (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
+-- Query8
+SELECT dept_name, AVG(salary) AS avg_salary FROM INSTRUCTOR GROUP BY dept_name HAVING AVG(salary) > 42000; 
+
+Output:
+
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| Id        | int         | NO   | PRI | NULL    |       |
+| name      | varchar(15) | YES  |     | NULL    |       |
+| dept_name | varchar(15) | YES  |     | NULL    |       |
+| salary    | int         | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
++-------+------------+-----------+--------+
+| Id    | name       | dept_name | salary |
++-------+------------+-----------+--------+
+| 10101 | srinivasan | comp.sci  |  65000 |
+| 12121 | wu         | finance   |  90000 |
+| 15151 | mozart     | music     |  40000 |
+| 22222 | einstein   | physics   |  95000 |
+| 32343 | el said    | history   |  60000 |
+| 33456 | gold       | physics   |  87000 |
+| 45565 | katz       | comp.sci  |  75000 |
+| 58583 | califieri  | history   |  62000 |
+| 76543 | singh      | finance   |  80000 |
+| 76766 | crick      | biology   |  72000 |
+| 83821 | brandt     | comp.sci  |  92000 |
+| 98345 | kim        | elec.eng  |  80000 |
++-------+------------+-----------+--------+
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| Id        | int         | YES  |     | NULL    |       |
+| course_id | varchar(15) | YES  |     | NULL    |       |
+| sec_id    | int         | YES  |     | NULL    |       |
+| semester  | varchar(15) | YES  |     | NULL    |       |
+| year      | int         | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
++-------+-----------+--------+----------+------+
+| Id    | course_id | sec_id | semester | year |
++-------+-----------+--------+----------+------+
+| 10101 | CS-101    |      1 | fall     | 2017 |
+| 10101 | CS-315    |      1 | spring   | 2018 |
+| 10101 | CS-347    |      1 | fall     | 2017 |
+| 12121 | FIN-201   |      1 | spring   | 2018 |
+| 15151 | MU-199    |      1 | spring   | 2018 |
+| 22222 | PHY-101   |      1 | fall     | 2017 |
+| 32343 | HIS-351   |      1 | spring   | 2018 |
+| 45565 | CS-101    |      1 | spring   | 2018 |
+| 45565 | CS-319    |      1 | spring   | 2018 |
+| 76766 | BIO-101   |      1 | summer   | 2017 |
+| 76766 | BIO-301   |      1 | summer   | 2018 |
+| 83821 | CS-190    |      1 | spring   | 2017 |
+| 83821 | CS-190    |      2 | spring   | 2017 |
+| 83821 | CS-319    |      2 | spring   | 2018 |
+| 98345 | EE-181    |      1 | spring   | 2017 |
++-------+-----------+--------+----------+------+
++-------+------------+-----------+--------+
+| Id    | name       | dept_name | salary |
++-------+------------+-----------+--------+
+| 10101 | srinivasan | comp.sci  |  65000 |
+| 10211 | smith      | biology   |  66000 |
+| 12121 | wu         | finance   |  90000 |
+| 15151 | mozart     | music     |  40000 |
+| 22222 | einstein   | physics   |  95000 |
+| 32343 | el said    | history   |  60000 |
+| 33456 | gold       | physics   |  87000 |
+| 45565 | katz       | comp.sci  |  75000 |
+| 58583 | califieri  | history   |  62000 |
+| 76543 | singh      | finance   |  80000 |
+| 76766 | crick      | biology   |  72000 |
+| 83821 | brandt     | comp.sci  |  92000 |
+| 98345 | kim        | elec.eng  |  80000 |
++-------+------------+-----------+--------+
++-------+------------+-----------+--------+
+| Id    | name       | dept_name | salary |
++-------+------------+-----------+--------+
+| 10101 | srinivasan | comp.sci  |  65000 |
+| 12121 | wu         | finance   |  90000 |
+| 15151 | mozart     | music     |  40000 |
+| 22222 | einstein   | physics   |  95000 |
+| 32343 | el said    | history   |  60000 |
+| 33456 | gold       | physics   |  87000 |
+| 45565 | katz       | comp.sci  |  75000 |
+| 58583 | califieri  | history   |  62000 |
+| 76543 | singh      | finance   |  80000 |
+| 76766 | crick      | biology   |  72000 |
+| 83821 | brandt     | comp.sci  |  92000 |
+| 98345 | kim        | elec.eng  |  80000 |
++-------+------------+-----------+--------+
++-------+-----------+-----------+--------+
+| Id    | name      | dept_name | salary |
++-------+-----------+-----------+--------+
+| 32343 | el said   | history   |  60000 |
+| 58583 | califieri | history   |  62000 |
++-------+-----------+-----------+--------+
++-------+------------+-----------+--------+-------+-----------+--------+----------+------+
+| Id    | name       | dept_name | salary | Id    | course_id | sec_id | semester | year |
++-------+------------+-----------+--------+-------+-----------+--------+----------+------+
+| 98345 | kim        | elec.eng  |  80000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 76766 | crick      | biology   |  72000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 76543 | singh      | finance   |  80000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 58583 | califieri  | history   |  62000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 33456 | gold       | physics   |  87000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 32343 | el said    | history   |  60000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 22222 | einstein   | physics   |  95000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 15151 | mozart     | music     |  40000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 12121 | wu         | finance   |  90000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 10101 | CS-101    |      1 | fall     | 2017 |
+| 98345 | kim        | elec.eng  |  80000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 10101 | CS-315    |      1 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 76766 | crick      | biology   |  72000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 76543 | singh      | finance   |  80000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 58583 | califieri  | history   |  62000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 33456 | gold       | physics   |  87000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 32343 | el said    | history   |  60000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 22222 | einstein   | physics   |  95000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 15151 | mozart     | music     |  40000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 12121 | wu         | finance   |  90000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 10101 | CS-347    |      1 | fall     | 2017 |
+| 98345 | kim        | elec.eng  |  80000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 12121 | FIN-201   |      1 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 15151 | MU-199    |      1 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 76766 | crick      | biology   |  72000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 76543 | singh      | finance   |  80000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 58583 | califieri  | history   |  62000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 33456 | gold       | physics   |  87000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 32343 | el said    | history   |  60000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 22222 | einstein   | physics   |  95000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 15151 | mozart     | music     |  40000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 12121 | wu         | finance   |  90000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 22222 | PHY-101   |      1 | fall     | 2017 |
+| 98345 | kim        | elec.eng  |  80000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 32343 | HIS-351   |      1 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 45565 | CS-101    |      1 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 45565 | CS-319    |      1 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 76766 | crick      | biology   |  72000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 76543 | singh      | finance   |  80000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 58583 | califieri  | history   |  62000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 33456 | gold       | physics   |  87000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 32343 | el said    | history   |  60000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 22222 | einstein   | physics   |  95000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 15151 | mozart     | music     |  40000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 12121 | wu         | finance   |  90000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 76766 | BIO-101   |      1 | summer   | 2017 |
+| 98345 | kim        | elec.eng  |  80000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 76766 | crick      | biology   |  72000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 76543 | singh      | finance   |  80000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 58583 | califieri  | history   |  62000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 33456 | gold       | physics   |  87000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 32343 | el said    | history   |  60000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 15151 | mozart     | music     |  40000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 12121 | wu         | finance   |  90000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 76766 | BIO-301   |      1 | summer   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 76766 | crick      | biology   |  72000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 76543 | singh      | finance   |  80000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 58583 | califieri  | history   |  62000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 33456 | gold       | physics   |  87000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 32343 | el said    | history   |  60000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 22222 | einstein   | physics   |  95000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 15151 | mozart     | music     |  40000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 12121 | wu         | finance   |  90000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 83821 | CS-190    |      1 | spring   | 2017 |
+| 98345 | kim        | elec.eng  |  80000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 76766 | crick      | biology   |  72000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 76543 | singh      | finance   |  80000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 58583 | califieri  | history   |  62000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 33456 | gold       | physics   |  87000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 32343 | el said    | history   |  60000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 22222 | einstein   | physics   |  95000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 15151 | mozart     | music     |  40000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 12121 | wu         | finance   |  90000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 83821 | CS-190    |      2 | spring   | 2017 |
+| 98345 | kim        | elec.eng  |  80000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 83821 | brandt     | comp.sci  |  92000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 76766 | crick      | biology   |  72000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 76543 | singh      | finance   |  80000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 58583 | califieri  | history   |  62000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 45565 | katz       | comp.sci  |  75000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 33456 | gold       | physics   |  87000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 32343 | el said    | history   |  60000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 22222 | einstein   | physics   |  95000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 15151 | mozart     | music     |  40000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 12121 | wu         | finance   |  90000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 10101 | srinivasan | comp.sci  |  65000 | 83821 | CS-319    |      2 | spring   | 2018 |
+| 98345 | kim        | elec.eng  |  80000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 83821 | brandt     | comp.sci  |  92000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 76766 | crick      | biology   |  72000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 76543 | singh      | finance   |  80000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 58583 | califieri  | history   |  62000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 45565 | katz       | comp.sci  |  75000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 33456 | gold       | physics   |  87000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 32343 | el said    | history   |  60000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 22222 | einstein   | physics   |  95000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 15151 | mozart     | music     |  40000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 12121 | wu         | finance   |  90000 | 98345 | EE-181    |      1 | spring   | 2017 |
+| 10101 | srinivasan | comp.sci  |  65000 | 98345 | EE-181    |      1 | spring   | 2017 |
++-------+------------+-----------+--------+-------+-----------+--------+----------+------+
++----------+
+| name     |
++----------+
+| wu       |
+| einstein |
+| brandt   |
++----------+
++-------+------------+-----------+--------+
+| Id    | name       | dept_name | salary |
++-------+------------+-----------+--------+
+| 15151 | mozart     | music     |  40000 |
+| 32343 | el said    | history   |  60000 |
+| 58583 | califieri  | history   |  62000 |
+| 10101 | srinivasan | comp.sci  |  65000 |
+| 76766 | crick      | biology   |  72000 |
+| 45565 | katz       | comp.sci  |  75000 |
+| 76543 | singh      | finance   |  80000 |
+| 98345 | kim        | elec.eng  |  80000 |
+| 33456 | gold       | physics   |  87000 |
+| 12121 | wu         | finance   |  90000 |
+| 83821 | brandt     | comp.sci  |  92000 |
+| 22222 | einstein   | physics   |  95000 |
++-------+------------+-----------+--------+
++-----------+
+| course_id |
++-----------+
+| CS-315    |
+| FIN-201   |
+| MU-199    |
+| HIS-351   |
+| CS-101    |
+| CS-319    |
+| CS-319    |
++-----------+
