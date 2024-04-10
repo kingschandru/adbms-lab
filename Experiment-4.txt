@@ -15,4 +15,4 @@ create VIEW faculty as select Id, name, dept_name from instructor;
 select *from faculty;
 
 -- 5
--- grant select on faculty to new_user;
+ grant select on faculty to new_user;
