@@ -1,0 +1,52 @@
+
+-- EXPERIMENT5
+-- 1
+CREATE VIEW faculty AS
+SELECT ID, name, dept_name
+FROM INSTRUCTOR;
+
+-- 3
+ CREATE ROLE student;
+
+-- 4
+ GRANT SELECT ON faculty TO student;
+
+-- 5
+CREATE USER new_user IDENTIFIED BY 'password';
+
+
+ GRANT student TO new_user;
+
+-- 6
+ SELECT * FROM faculty WHERE dept_name = 'Biology';
+
+-- 7
+ REVOKE student FROM new_user;
+
+-- 8
+ DROP ROLE student;
+
+-- 9
+ GRANT SELECT ON faculty TO new_user;
+
+-- 10
+ SELECT * FROM faculty WHERE dept_name = 'Finance';
+
+
+-- 12
+ CREATE TABLE TEACHES2 (
+    ID INTEGER NOT NULL,
+	COURSE_ID VARCHAR(50) NOT NULL,
+	SEC_ID TEXT NOT NULL,
+	SEMESTER CHAR(50) NOT NULL CHECK (SEMESTER IN ('Fall', 'Winter', 'Spring', 'Summer')),
+	YEAR INT NOT NULL,
+	FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID)
+     );
+
+ select * from TEACHES2;
+
+-- 13
+ CREATE INDEX teaches_id_index ON TEACHES(ID);
+
+-- 14 
+drop index teaches_id_index;
