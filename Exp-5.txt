@@ -8,15 +8,18 @@ FROM INSTRUCTOR;
 -- 3
  CREATE ROLE student;
 Query OK, 0 rows affected (0.005 sec)
+
 -- 4
  GRANT SELECT ON faculty TO student;
 Query OK, 0 rows affected (0.002 sec)
+
 -- 5
 CREATE USER new_user IDENTIFIED BY 'password';
 Query OK, 0 rows affected (0.002 sec)
 
  GRANT student TO new_user;
 Query OK, 0 rows affected (0.001 sec)
+
 -- 6
  SELECT * FROM faculty WHERE dept_name = 'Biology';
 
