@@ -76,7 +76,6 @@ WHERE salary BETWEEN 90000 AND 100000;
 
 
 
-
 -- EXPERIMENT-2
 
 -- Query1
@@ -130,7 +129,6 @@ WHERE dept_name = 'History';
 
 
 
-
 -- EXPERIMENT-3
 
 -- Query1
@@ -163,6 +161,8 @@ SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ANY (SELECT salary FROM INSTRUC
 SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ALL (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
 -- Query8
 SELECT dept_name, AVG(salary) AS avg_salary FROM INSTRUCTOR GROUP BY dept_name HAVING AVG(salary) > 42000; 
+
+
 
 
 -- EXPERIMENT4
