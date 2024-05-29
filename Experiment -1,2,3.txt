@@ -490,3 +490,45 @@ Output:
 | Chemistry | 80000.0000 |
 | Biology   | 66000.0000 |
 +-----------+------------+
+
++-----------+
+| dept_name |
++-----------+
+| History   |
+| Physics   |
++-----------+
++---------------+-----------+
+| name          | course_id |
++---------------+-----------+
+| sukindar Sing | HIS-01    |
+| sukindar Sing | HIS-11    |
+| akash         | HIS-11    |
+| sridar        | PHY-01    |
+| sridar        | PHY-02    |
+| monish        | CHE-11    |
+| guru          | PHY-11    |
++---------------+-----------+
++---------------+-----------+
+| name          | course_id |
++---------------+-----------+
+| sukindar Sing | HIS-11    |
+| sukindar Sing | HIS-01    |
+| akash         | HIS-11    |
+| sridar        | PHY-02    |
+| sridar        | PHY-01    |
+| monish        | CHE-11    |
+| guru          | PHY-11    |
+| Smith         | null      |
+| Tom           | null      |
++---------------+-----------+
++-------+---------------+-----------+
+| Id    | name          | dept_name |
++-------+---------------+-----------+
+|     1 | sukindar Sing | History   |
+|     2 | akash         | History   |
+|     3 | sridar        | Physics   |
+|     4 | monish        | Chemistry |
+|     5 | guru          | Physics   |
+| 10211 | Smith         | Biology   |
+| 10212 | Tom           | Biology   |
++-------+---------------+-----------+
