@@ -1,0 +1,582 @@
+EXPERIMENT-1
+
+CREATE TABLE Instructor (
+  ID INTEGER PRIMARY KEY,
+  name TEXT ,
+  dept_name TEXT ,
+  salary INTEGER
+);
+
+-- insert
+INSERT INTO Instructor VALUES (0001, 'sukindar Sing', 'History', 100000);
+INSERT INTO Instructor VALUES (0002, 'akash', 'History', 90000);
+INSERT INTO Instructor VALUES (0003, 'sridar', 'Physics', 90000);
+INSERT INTO Instructor VALUES (0004, 'monish', 'Chemistry', 80000);
+INSERT INTO Instructor VALUES (0005, 'guru', 'Physics', 100000);
+
+-- create
+CREATE TABLE Teaches (
+  ID INTEGER ,
+  Course_Id VARCHAR(255) ,
+  Sec_Id INTEGER ,
+  semester TEXT ,
+  year INTEGER,
+  FOREIGN KEY (ID) REFERENCES Instructor(ID)
+);
+-- (currently there is no PRIMARY KEY for Teaches relation)
+
+-- insert
+INSERT INTO Teaches VALUES (0001, 'HIS-01', 1, 'fall', 2017);
+INSERT INTO Teaches VALUES (0001, 'HIS-11', 1, 'Spring', 2018);
+INSERT INTO Teaches VALUES (0002, 'HIS-11', 1, 'fall', 2017);
+INSERT INTO Teaches VALUES (0003, 'PHY-01', 2, 'Summer', 2018);
+INSERT INTO Teaches VALUES (0003, 'PHY-02', 2, 'fall', 2018);
+INSERT INTO Teaches VALUES (0004, 'CHE-11', 3, 'Spring', 2018);
+INSERT INTO Teaches VALUES (0005, 'PHY-11', 3, 'Summer', 2017);
+-- (given inter datatype for the year)
+
+SELECT * FROM Instructor ;
+SELECT * FROM Teaches ;
+
+-- Query3
+INSERT INTO Instructor VALUES (0006, 'Smith', 'Biology', 66000);
+SELECT * FROM Instructor ;
+
+-- Query4
+DELETE FROM Instructor
+WHERE ID=0006;
+SELECT * FROM Instructor ;
+
+-- Query5
+SELECT * FROM Instructor
+WHERE dept_name='History';
+
+-- Query6
+SELECT *
+FROM Instructor
+CROSS JOIN Teaches;
+-- (give different name for ID values in 2 TABLE while selecting)
+
+-- Query7
+SELECT Instructor.name, Teaches.Course_Id
+FROM Instructor
+CROSS JOIN Teaches;
+-- (currently no features to manage the null values)
+
+-- Query8
+SELECT *
+FROM Instructor
+WHERE name LIKE '%dar%';
+
+-- Query9
+SELECT name
+FROM Instructor
+WHERE salary BETWEEN 90000 AND 100000;
+
+
+
+
+-- EXPERIMENT-2
+
+-- Query1
+SELECT *
+FROM Instructor
+ORDER BY salary DESC;
+
+-- Query2
+SELECT Course_Id
+FROM Teaches
+WHERE (semester = 'fall' AND year = 2017)
+   OR (semester = 'Spring' AND year = 2018);
+   
+
+-- Query3
+SELECT Course_Id
+FROM Teaches AS t1
+WHERE semester = 'fall' AND year = 2017
+AND EXISTS (
+    SELECT 1
+    FROM Teaches AS t2
+    WHERE t1.Course_Id = t2.Course_Id
+      AND t2.semester = 'Spring' AND t2.year = 2018
+);
+
+-- Query4
+SELECT Course_Id
+FROM Teaches
+WHERE semester = 'fall' AND year = 2017
+AND Course_Id NOT IN (
+    SELECT Course_Id
+    FROM Teaches
+    WHERE semester = 'Spring' AND year = 2018
+);
+-- (check)
+
+-- Query5
+INSERT INTO Instructor VALUES (10211, 'Smith', 'Biology', 66000);
+INSERT INTO Instructor VALUES (10212, 'Tom', 'Biology', null);
+SELECT * FROM Instructor ;
+
+-- Query6
+SELECT * FROM Instructor
+WHERE salary IS NULL;
+
+-- Query7
+SELECT AVG(salary) AS average_salary
+FROM Instructor
+WHERE dept_name = 'History';
+
+
+
+
+-- EXPERIMENT-3
+
+-- Query1
+SELECT COUNT(DISTINCT ID) AS unique_id_count
+FROM Teaches
+WHERE semester = 'Spring' AND year = 2018;
+-- (check)
+
+-- Query2
+SELECT COUNT(*) AS unique_id_count
+FROM Teaches;
+-- (check)
+
+-- Query3
+SELECT dept_name, AVG(salary) AS average_salary
+FROM Instructor
+GROUP BY dept_name;
+
+-- Query4
+SELECT dept_name, AVG(salary) AS average_salary
+FROM Instructor
+GROUP BY dept_name
+HAVING AVG(salary) > 42000;
+
+-- Query5 
+SELECT name FROM INSTRUCTOR WHERE name NOT IN ('Mozart', 'Einstein');
+-- query6
+SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ANY (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
+-- query7
+SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ALL (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
+-- Query8
+SELECT dept_name, AVG(salary) AS avg_salary FROM INSTRUCTOR GROUP BY dept_name HAVING AVG(salary) > 42000; 
+
+
+
+
+-- EXPERIMENT4
+
+-- 1
+select dept_name from instructor group by dept_name
+having sum(salary) > (select avg(total_salary) from (select dept_name, sum(salary) as total_salary from instructor group by dept_name) as dept_salary_avg);
+
+-- 2
+select name,course_id from instructor join teaches on instructor.Id = teaches.Id;
+
+-- 3
+select instructor.name, coalesce(teaches.course_id, 'null') as course_id from instructor left join teaches on instructor.Id = teaches.Id;
+
+-- 4
+create VIEW faculty as select Id, name, dept_name from instructor;
+select *from faculty;
+
+-- 5
+ grant select on faculty to new_user;
+
+
+
+
+-- EXPERIMENT-5
+-- 1
+CREATE VIEW faculty AS
+SELECT ID, name, dept_name
+FROM INSTRUCTOR;
+
+-- 3
+ CREATE ROLE student;
+Query OK, 0 rows affected (0.005 sec)
+
+-- 4
+ GRANT SELECT ON faculty TO student;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 5
+CREATE USER new_user IDENTIFIED BY 'password';
+Query OK, 0 rows affected (0.002 sec)
+
+ GRANT student TO new_user;
+Query OK, 0 rows affected (0.001 sec)
+
+-- 6
+ SELECT * FROM faculty WHERE dept_name = 'Biology';
+
+-- 7
+ REVOKE student FROM new_user;
+Query OK, 0 rows affected (0.001 sec)
+
+-- 8
+ DROP ROLE student;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 9
+ GRANT SELECT ON faculty TO new_user;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 10
+ SELECT * FROM faculty WHERE dept_name = 'Finance';
+
+
+-- 12
+ CREATE TABLE TEACHES2 (
+    ID INTEGER NOT NULL,
+	COURSE_ID VARCHAR(50) NOT NULL,
+	SEC_ID TEXT NOT NULL,
+	SEMESTER CHAR(50) NOT NULL CHECK (SEMESTER IN ('Fall', 'Winter', 'Spring', 'Summer')),
+	YEAR INT NOT NULL,
+	FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID)
+     );
+
+Query OK, 0 rows affected (0.014 sec)
+
+ select * from TEACHES2;
+
+-- 13
+ CREATE INDEX teaches_id_index ON TEACHES(ID);
+Query OK, 0 rows affected (0.022 sec)
+
+-- 14 
+drop index teaches_id_index;
+
+
+Output:
+
++----+---------------+-----------+--------+
+| ID | name          | dept_name | salary |
++----+---------------+-----------+--------+
+|  1 | sukindar Sing | History   | 100000 |
+|  2 | akash         | History   |  90000 |
+|  3 | sridar        | Physics   |  90000 |
+|  4 | monish        | Chemistry |  80000 |
+|  5 | guru          | Physics   | 100000 |
++----+---------------+-----------+--------+
++------+-----------+--------+----------+------+
+| ID   | Course_Id | Sec_Id | semester | year |
++------+-----------+--------+----------+------+
+|    1 | HIS-01    |      1 | fall     | 2017 |
+|    1 | HIS-11    |      1 | Spring   | 2018 |
+|    2 | HIS-11    |      1 | fall     | 2017 |
+|    3 | PHY-01    |      2 | Summer   | 2018 |
+|    3 | PHY-02    |      2 | fall     | 2018 |
+|    4 | CHE-11    |      3 | Spring   | 2018 |
+|    5 | PHY-11    |      3 | Summer   | 2017 |
++------+-----------+--------+----------+------+
++----+---------------+-----------+--------+
+| ID | name          | dept_name | salary |
++----+---------------+-----------+--------+
+|  1 | sukindar Sing | History   | 100000 |
+|  2 | akash         | History   |  90000 |
+|  3 | sridar        | Physics   |  90000 |
+|  4 | monish        | Chemistry |  80000 |
+|  5 | guru          | Physics   | 100000 |
+|  6 | Smith         | Biology   |  66000 |
++----+---------------+-----------+--------+
++----+---------------+-----------+--------+
+| ID | name          | dept_name | salary |
++----+---------------+-----------+--------+
+|  1 | sukindar Sing | History   | 100000 |
+|  2 | akash         | History   |  90000 |
+|  3 | sridar        | Physics   |  90000 |
+|  4 | monish        | Chemistry |  80000 |
+|  5 | guru          | Physics   | 100000 |
++----+---------------+-----------+--------+
++----+---------------+-----------+--------+
+| ID | name          | dept_name | salary |
++----+---------------+-----------+--------+
+|  1 | sukindar Sing | History   | 100000 |
+|  2 | akash         | History   |  90000 |
++----+---------------+-----------+--------+
++----+---------------+-----------+--------+------+-----------+--------+----------+------+
+| ID | name          | dept_name | salary | ID   | Course_Id | Sec_Id | semester | year |
++----+---------------+-----------+--------+------+-----------+--------+----------+------+
+|  5 | guru          | Physics   | 100000 |    1 | HIS-01    |      1 | fall     | 2017 |
+|  4 | monish        | Chemistry |  80000 |    1 | HIS-01    |      1 | fall     | 2017 |
+|  3 | sridar        | Physics   |  90000 |    1 | HIS-01    |      1 | fall     | 2017 |
+|  2 | akash         | History   |  90000 |    1 | HIS-01    |      1 | fall     | 2017 |
+|  1 | sukindar Sing | History   | 100000 |    1 | HIS-01    |      1 | fall     | 2017 |
+|  5 | guru          | Physics   | 100000 |    1 | HIS-11    |      1 | Spring   | 2018 |
+|  4 | monish        | Chemistry |  80000 |    1 | HIS-11    |      1 | Spring   | 2018 |
+|  3 | sridar        | Physics   |  90000 |    1 | HIS-11    |      1 | Spring   | 2018 |
+|  2 | akash         | History   |  90000 |    1 | HIS-11    |      1 | Spring   | 2018 |
+|  1 | sukindar Sing | History   | 100000 |    1 | HIS-11    |      1 | Spring   | 2018 |
+|  5 | guru          | Physics   | 100000 |    2 | HIS-11    |      1 | fall     | 2017 |
+|  4 | monish        | Chemistry |  80000 |    2 | HIS-11    |      1 | fall     | 2017 |
+|  3 | sridar        | Physics   |  90000 |    2 | HIS-11    |      1 | fall     | 2017 |
+|  2 | akash         | History   |  90000 |    2 | HIS-11    |      1 | fall     | 2017 |
+|  1 | sukindar Sing | History   | 100000 |    2 | HIS-11    |      1 | fall     | 2017 |
+|  5 | guru          | Physics   | 100000 |    3 | PHY-01    |      2 | Summer   | 2018 |
+|  4 | monish        | Chemistry |  80000 |    3 | PHY-01    |      2 | Summer   | 2018 |
+|  3 | sridar        | Physics   |  90000 |    3 | PHY-01    |      2 | Summer   | 2018 |
+|  2 | akash         | History   |  90000 |    3 | PHY-01    |      2 | Summer   | 2018 |
+|  1 | sukindar Sing | History   | 100000 |    3 | PHY-01    |      2 | Summer   | 2018 |
+|  5 | guru          | Physics   | 100000 |    3 | PHY-02    |      2 | fall     | 2018 |
+|  4 | monish        | Chemistry |  80000 |    3 | PHY-02    |      2 | fall     | 2018 |
+|  3 | sridar        | Physics   |  90000 |    3 | PHY-02    |      2 | fall     | 2018 |
+|  2 | akash         | History   |  90000 |    3 | PHY-02    |      2 | fall     | 2018 |
+|  1 | sukindar Sing | History   | 100000 |    3 | PHY-02    |      2 | fall     | 2018 |
+|  5 | guru          | Physics   | 100000 |    4 | CHE-11    |      3 | Spring   | 2018 |
+|  4 | monish        | Chemistry |  80000 |    4 | CHE-11    |      3 | Spring   | 2018 |
+|  3 | sridar        | Physics   |  90000 |    4 | CHE-11    |      3 | Spring   | 2018 |
+|  2 | akash         | History   |  90000 |    4 | CHE-11    |      3 | Spring   | 2018 |
+|  1 | sukindar Sing | History   | 100000 |    4 | CHE-11    |      3 | Spring   | 2018 |
+|  5 | guru          | Physics   | 100000 |    5 | PHY-11    |      3 | Summer   | 2017 |
+|  4 | monish        | Chemistry |  80000 |    5 | PHY-11    |      3 | Summer   | 2017 |
+|  3 | sridar        | Physics   |  90000 |    5 | PHY-11    |      3 | Summer   | 2017 |
+|  2 | akash         | History   |  90000 |    5 | PHY-11    |      3 | Summer   | 2017 |
+|  1 | sukindar Sing | History   | 100000 |    5 | PHY-11    |      3 | Summer   | 2017 |
++----+---------------+-----------+--------+------+-----------+--------+----------+------+
++---------------+-----------+
+| name          | Course_Id |
++---------------+-----------+
+| guru          | HIS-01    |
+| monish        | HIS-01    |
+| sridar        | HIS-01    |
+| akash         | HIS-01    |
+| sukindar Sing | HIS-01    |
+| guru          | HIS-11    |
+| monish        | HIS-11    |
+| sridar        | HIS-11    |
+| akash         | HIS-11    |
+| sukindar Sing | HIS-11    |
+| guru          | HIS-11    |
+| monish        | HIS-11    |
+| sridar        | HIS-11    |
+| akash         | HIS-11    |
+| sukindar Sing | HIS-11    |
+| guru          | PHY-01    |
+| monish        | PHY-01    |
+| sridar        | PHY-01    |
+| akash         | PHY-01    |
+| sukindar Sing | PHY-01    |
+| guru          | PHY-02    |
+| monish        | PHY-02    |
+| sridar        | PHY-02    |
+| akash         | PHY-02    |
+| sukindar Sing | PHY-02    |
+| guru          | CHE-11    |
+| monish        | CHE-11    |
+| sridar        | CHE-11    |
+| akash         | CHE-11    |
+| sukindar Sing | CHE-11    |
+| guru          | PHY-11    |
+| monish        | PHY-11    |
+| sridar        | PHY-11    |
+| akash         | PHY-11    |
+| sukindar Sing | PHY-11    |
++---------------+-----------+
++----+---------------+-----------+--------+
+| ID | name          | dept_name | salary |
++----+---------------+-----------+--------+
+|  1 | sukindar Sing | History   | 100000 |
+|  3 | sridar        | Physics   |  90000 |
++----+---------------+-----------+--------+
++---------------+
+| name          |
++---------------+
+| sukindar Sing |
+| akash         |
+| sridar        |
+| guru          |
++---------------+
++----+---------------+-----------+--------+
+| ID | name          | dept_name | salary |
++----+---------------+-----------+--------+
+|  1 | sukindar Sing | History   | 100000 |
+|  5 | guru          | Physics   | 100000 |
+|  2 | akash         | History   |  90000 |
+|  3 | sridar        | Physics   |  90000 |
+|  4 | monish        | Chemistry |  80000 |
++----+---------------+-----------+--------+
++-----------+
+| Course_Id |
++-----------+
+| HIS-01    |
+| HIS-11    |
+| HIS-11    |
+| CHE-11    |
++-----------+
++-----------+
+| Course_Id |
++-----------+
+| HIS-11    |
++-----------+
++-----------+
+| Course_Id |
++-----------+
+| HIS-01    |
++-----------+
++-------+---------------+-----------+--------+
+| ID    | name          | dept_name | salary |
++-------+---------------+-----------+--------+
+|     1 | sukindar Sing | History   | 100000 |
+|     2 | akash         | History   |  90000 |
+|     3 | sridar        | Physics   |  90000 |
+|     4 | monish        | Chemistry |  80000 |
+|     5 | guru          | Physics   | 100000 |
+| 10211 | Smith         | Biology   |  66000 |
+| 10212 | Tom           | Biology   |   NULL |
++-------+---------------+-----------+--------+
++-------+------+-----------+--------+
+| ID    | name | dept_name | salary |
++-------+------+-----------+--------+
+| 10212 | Tom  | Biology   |   NULL |
++-------+------+-----------+--------+
++----------------+
+| average_salary |
++----------------+
+|     95000.0000 |
++----------------+
++-----------------+
+| unique_id_count |
++-----------------+
+|               2 |
++-----------------+
++-----------------+
+| unique_id_count |
++-----------------+
+|               7 |
++-----------------+
++-----------+----------------+
+| dept_name | average_salary |
++-----------+----------------+
+| History   |     95000.0000 |
+| Physics   |     95000.0000 |
+| Chemistry |     80000.0000 |
+| Biology   |     66000.0000 |
++-----------+----------------+
++-----------+----------------+
+| dept_name | average_salary |
++-----------+----------------+
+| History   |     95000.0000 |
+| Physics   |     95000.0000 |
+| Chemistry |     80000.0000 |
+| Biology   |     66000.0000 |
++-----------+----------------+
++---------------+
+| name          |
++---------------+
+| sukindar Sing |
+| akash         |
+| sridar        |
+| monish        |
+| guru          |
+| Smith         |
+| Tom           |
++---------------+
++---------------+
+| name          |
++---------------+
+| sukindar Sing |
+| akash         |
+| sridar        |
+| monish        |
+| guru          |
++---------------+
++-----------+------------+
+| dept_name | avg_salary |
++-----------+------------+
+| History   | 95000.0000 |
+| Physics   | 95000.0000 |
+| Chemistry | 80000.0000 |
+| Biology   | 66000.0000 |
++-----------+------------+
+
++-----------+
+| dept_name |
++-----------+
+| History   |
+| Physics   |
++-----------+
++---------------+-----------+
+| name          | course_id |
++---------------+-----------+
+| sukindar Sing | HIS-01    |
+| sukindar Sing | HIS-11    |
+| akash         | HIS-11    |
+| sridar        | PHY-01    |
+| sridar        | PHY-02    |
+| monish        | CHE-11    |
+| guru          | PHY-11    |
++---------------+-----------+
++---------------+-----------+
+| name          | course_id |
++---------------+-----------+
+| sukindar Sing | HIS-11    |
+| sukindar Sing | HIS-01    |
+| akash         | HIS-11    |
+| sridar        | PHY-02    |
+| sridar        | PHY-01    |
+| monish        | CHE-11    |
+| guru          | PHY-11    |
+| Smith         | null      |
+| Tom           | null      |
++---------------+-----------+
++-------+---------------+-----------+
+| Id    | name          | dept_name |
++-------+---------------+-----------+
+|     1 | sukindar Sing | History   |
+|     2 | akash         | History   |
+|     3 | sridar        | Physics   |
+|     4 | monish        | Chemistry |
+|     5 | guru          | Physics   |
+| 10211 | Smith         | Biology   |
+| 10212 | Tom           | Biology   |
++-------+---------------+-----------+
+
+
++-------+------------+------------+
+| ID    | name       | dept_name  |
++-------+------------+------------+
+| 10101 | Srinivasan | Comp. Sci. |
+| 10211 | Smith      | Biology    |
+| 12121 | Wu         | Finance    |
+| 15151 | Mozart     | Music      |
+| 22222 | Einstein   | Physics    |
+| 32343 | El Said    | History    |
+| 33456 | Gold       | Physics    |
+| 45565 | Katz       | Comp. Sci. |
+| 58583 | Cali       | History    |
+| 76543 | Singh      | Finance    |
+| 76766 | Crick      | Biology    |
+| 83821 | Brandt     | Comp. Sci. |
+| 98345 | Kim        | Elec. Eng. |
++-------+------------+------------+
+13 rows in set (0.001 sec)
+
+
+
++------------+--------------+
+| dept_name  | total_salary |
++------------+--------------+
+| Biology    |       138000 |
+| Comp. Sci. |       232000 |
+| Elec. Eng. |        80000 |
+| Finance    |       170000 |
+| History    |       120000 |
+| Music      |        40000 |
+| Physics    |       182000 |
++------------+--------------+
+
++-------+-------+-----------+
+| ID    | name  | dept_name |
++-------+-------+-----------+
+| 10211 | Smith | Biology   |
+| 76766 | Crick | Biology   |
++-------+-------+-----------+
+
++-------+-------+-----------+
+| ID    | name  | dept_name |
++-------+-------+-----------+
+| 12121 | Wu    | Finance   |
+| 76543 | Singh | Finance   |
++-------+-------+-----------+
