@@ -1,3 +1,5 @@
+EXPERIMENT-1
+
 CREATE TABLE Instructor (
   ID INTEGER PRIMARY KEY,
   name TEXT ,
@@ -75,7 +77,7 @@ WHERE salary BETWEEN 90000 AND 100000;
 
 
 
--- Qn2
+-- EXPERIMENT-2
 
 -- Query1
 SELECT *
@@ -129,7 +131,7 @@ WHERE dept_name = 'History';
 
 
 
--- Qn3
+-- EXPERIMENT-3
 
 -- Query1
 SELECT COUNT(DISTINCT ID) AS unique_id_count
@@ -161,6 +163,69 @@ SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ANY (SELECT salary FROM INSTRUC
 SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ALL (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
 -- Query8
 SELECT dept_name, AVG(salary) AS avg_salary FROM INSTRUCTOR GROUP BY dept_name HAVING AVG(salary) > 42000; 
+
+
+
+-- EXPERIMENT-5
+-- 1
+CREATE VIEW faculty AS
+SELECT ID, name, dept_name
+FROM INSTRUCTOR;
+
+-- 3
+ CREATE ROLE student;
+Query OK, 0 rows affected (0.005 sec)
+
+-- 4
+ GRANT SELECT ON faculty TO student;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 5
+CREATE USER new_user IDENTIFIED BY 'password';
+Query OK, 0 rows affected (0.002 sec)
+
+ GRANT student TO new_user;
+Query OK, 0 rows affected (0.001 sec)
+
+-- 6
+ SELECT * FROM faculty WHERE dept_name = 'Biology';
+
+-- 7
+ REVOKE student FROM new_user;
+Query OK, 0 rows affected (0.001 sec)
+
+-- 8
+ DROP ROLE student;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 9
+ GRANT SELECT ON faculty TO new_user;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 10
+ SELECT * FROM faculty WHERE dept_name = 'Finance';
+
+
+-- 12
+ CREATE TABLE TEACHES2 (
+    ID INTEGER NOT NULL,
+	COURSE_ID VARCHAR(50) NOT NULL,
+	SEC_ID TEXT NOT NULL,
+	SEMESTER CHAR(50) NOT NULL CHECK (SEMESTER IN ('Fall', 'Winter', 'Spring', 'Summer')),
+	YEAR INT NOT NULL,
+	FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID)
+     );
+
+Query OK, 0 rows affected (0.014 sec)
+
+ select * from TEACHES2;
+
+-- 13
+ CREATE INDEX teaches_id_index ON TEACHES(ID);
+Query OK, 0 rows affected (0.022 sec)
+
+-- 14 
+drop index teaches_id_index;
 
 
 Output:
