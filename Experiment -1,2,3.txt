@@ -532,3 +532,51 @@ Output:
 | 10211 | Smith         | Biology   |
 | 10212 | Tom           | Biology   |
 +-------+---------------+-----------+
+
+
++-------+------------+------------+
+| ID    | name       | dept_name  |
++-------+------------+------------+
+| 10101 | Srinivasan | Comp. Sci. |
+| 10211 | Smith      | Biology    |
+| 12121 | Wu         | Finance    |
+| 15151 | Mozart     | Music      |
+| 22222 | Einstein   | Physics    |
+| 32343 | El Said    | History    |
+| 33456 | Gold       | Physics    |
+| 45565 | Katz       | Comp. Sci. |
+| 58583 | Cali       | History    |
+| 76543 | Singh      | Finance    |
+| 76766 | Crick      | Biology    |
+| 83821 | Brandt     | Comp. Sci. |
+| 98345 | Kim        | Elec. Eng. |
++-------+------------+------------+
+13 rows in set (0.001 sec)
+
+
+
++------------+--------------+
+| dept_name  | total_salary |
++------------+--------------+
+| Biology    |       138000 |
+| Comp. Sci. |       232000 |
+| Elec. Eng. |        80000 |
+| Finance    |       170000 |
+| History    |       120000 |
+| Music      |        40000 |
+| Physics    |       182000 |
++------------+--------------+
+
++-------+-------+-----------+
+| ID    | name  | dept_name |
++-------+-------+-----------+
+| 10211 | Smith | Biology   |
+| 76766 | Crick | Biology   |
++-------+-------+-----------+
+
++-------+-------+-----------+
+| ID    | name  | dept_name |
++-------+-------+-----------+
+| 12121 | Wu    | Finance   |
+| 76543 | Singh | Finance   |
++-------+-------+-----------+
