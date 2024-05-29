@@ -76,179 +76,6 @@ WHERE salary BETWEEN 90000 AND 100000;
 
 
 
--- EXPERIMENT-2
-
--- Query1
-SELECT *
-FROM Instructor
-ORDER BY salary DESC;
-
--- Query2
-SELECT Course_Id
-FROM Teaches
-WHERE (semester = 'fall' AND year = 2017)
-   OR (semester = 'Spring' AND year = 2018);
-   
-
--- Query3
-SELECT Course_Id
-FROM Teaches AS t1
-WHERE semester = 'fall' AND year = 2017
-AND EXISTS (
-    SELECT 1
-    FROM Teaches AS t2
-    WHERE t1.Course_Id = t2.Course_Id
-      AND t2.semester = 'Spring' AND t2.year = 2018
-);
-
--- Query4
-SELECT Course_Id
-FROM Teaches
-WHERE semester = 'fall' AND year = 2017
-AND Course_Id NOT IN (
-    SELECT Course_Id
-    FROM Teaches
-    WHERE semester = 'Spring' AND year = 2018
-);
--- (check)
-
--- Query5
-INSERT INTO Instructor VALUES (10211, 'Smith', 'Biology', 66000);
-INSERT INTO Instructor VALUES (10212, 'Tom', 'Biology', null);
-SELECT * FROM Instructor ;
-
--- Query6
-SELECT * FROM Instructor
-WHERE salary IS NULL;
-
--- Query7
-SELECT AVG(salary) AS average_salary
-FROM Instructor
-WHERE dept_name = 'History';
-
-
-
-
--- EXPERIMENT-3
-
--- Query1
-SELECT COUNT(DISTINCT ID) AS unique_id_count
-FROM Teaches
-WHERE semester = 'Spring' AND year = 2018;
--- (check)
-
--- Query2
-SELECT COUNT(*) AS unique_id_count
-FROM Teaches;
--- (check)
-
--- Query3
-SELECT dept_name, AVG(salary) AS average_salary
-FROM Instructor
-GROUP BY dept_name;
-
--- Query4
-SELECT dept_name, AVG(salary) AS average_salary
-FROM Instructor
-GROUP BY dept_name
-HAVING AVG(salary) > 42000;
-
--- Query5 
-SELECT name FROM INSTRUCTOR WHERE name NOT IN ('Mozart', 'Einstein');
--- query6
-SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ANY (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
--- query7
-SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ALL (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
--- Query8
-SELECT dept_name, AVG(salary) AS avg_salary FROM INSTRUCTOR GROUP BY dept_name HAVING AVG(salary) > 42000; 
-
-
-
-
--- EXPERIMENT4
-
--- 1
-select dept_name from instructor group by dept_name
-having sum(salary) > (select avg(total_salary) from (select dept_name, sum(salary) as total_salary from instructor group by dept_name) as dept_salary_avg);
-
--- 2
-select name,course_id from instructor join teaches on instructor.Id = teaches.Id;
-
--- 3
-select instructor.name, coalesce(teaches.course_id, 'null') as course_id from instructor left join teaches on instructor.Id = teaches.Id;
-
--- 4
-create VIEW faculty as select Id, name, dept_name from instructor;
-select *from faculty;
-
--- 5
- grant select on faculty to new_user;
-
-
-
-
--- EXPERIMENT-5
--- 1
-CREATE VIEW faculty AS
-SELECT ID, name, dept_name
-FROM INSTRUCTOR;
-
--- 3
- CREATE ROLE student;
-Query OK, 0 rows affected (0.005 sec)
-
--- 4
- GRANT SELECT ON faculty TO student;
-Query OK, 0 rows affected (0.002 sec)
-
--- 5
-CREATE USER new_user IDENTIFIED BY 'password';
-Query OK, 0 rows affected (0.002 sec)
-
- GRANT student TO new_user;
-Query OK, 0 rows affected (0.001 sec)
-
--- 6
- SELECT * FROM faculty WHERE dept_name = 'Biology';
-
--- 7
- REVOKE student FROM new_user;
-Query OK, 0 rows affected (0.001 sec)
-
--- 8
- DROP ROLE student;
-Query OK, 0 rows affected (0.002 sec)
-
--- 9
- GRANT SELECT ON faculty TO new_user;
-Query OK, 0 rows affected (0.002 sec)
-
--- 10
- SELECT * FROM faculty WHERE dept_name = 'Finance';
-
-
--- 12
- CREATE TABLE TEACHES2 (
-    ID INTEGER NOT NULL,
-	COURSE_ID VARCHAR(50) NOT NULL,
-	SEC_ID TEXT NOT NULL,
-	SEMESTER CHAR(50) NOT NULL CHECK (SEMESTER IN ('Fall', 'Winter', 'Spring', 'Summer')),
-	YEAR INT NOT NULL,
-	FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID)
-     );
-
-Query OK, 0 rows affected (0.014 sec)
-
- select * from TEACHES2;
-
--- 13
- CREATE INDEX teaches_id_index ON TEACHES(ID);
-Query OK, 0 rows affected (0.022 sec)
-
--- 14 
-drop index teaches_id_index;
-
-
 Output:
 
 +----+---------------+-----------+--------+
@@ -388,6 +215,63 @@ Output:
 | sridar        |
 | guru          |
 +---------------+
+
+
+
+
+-- EXPERIMENT-2
+
+-- Query1
+SELECT *
+FROM Instructor
+ORDER BY salary DESC;
+
+-- Query2
+SELECT Course_Id
+FROM Teaches
+WHERE (semester = 'fall' AND year = 2017)
+   OR (semester = 'Spring' AND year = 2018);
+   
+
+-- Query3
+SELECT Course_Id
+FROM Teaches AS t1
+WHERE semester = 'fall' AND year = 2017
+AND EXISTS (
+    SELECT 1
+    FROM Teaches AS t2
+    WHERE t1.Course_Id = t2.Course_Id
+      AND t2.semester = 'Spring' AND t2.year = 2018
+);
+
+-- Query4
+SELECT Course_Id
+FROM Teaches
+WHERE semester = 'fall' AND year = 2017
+AND Course_Id NOT IN (
+    SELECT Course_Id
+    FROM Teaches
+    WHERE semester = 'Spring' AND year = 2018
+);
+-- (check)
+
+-- Query5
+INSERT INTO Instructor VALUES (10211, 'Smith', 'Biology', 66000);
+INSERT INTO Instructor VALUES (10212, 'Tom', 'Biology', null);
+SELECT * FROM Instructor ;
+
+-- Query6
+SELECT * FROM Instructor
+WHERE salary IS NULL;
+
+-- Query7
+SELECT AVG(salary) AS average_salary
+FROM Instructor
+WHERE dept_name = 'History';
+
+
+--output:
+
 +----+---------------+-----------+--------+
 | ID | name          | dept_name | salary |
 +----+---------------+-----------+--------+
@@ -436,6 +320,69 @@ Output:
 +----------------+
 |     95000.0000 |
 +----------------+
+
+
+
+
+-- EXPERIMENT-3
+
+-- Query1
+SELECT COUNT(DISTINCT ID) AS unique_id_count
+FROM Teaches
+WHERE semester = 'Spring' AND year = 2018;
+-- (check)
+
+-- Query2
+SELECT COUNT(*) AS unique_id_count
+FROM Teaches;
+-- (check)
+
+-- Query3
+SELECT dept_name, AVG(salary) AS average_salary
+FROM Instructor
+GROUP BY dept_name;
+
+-- Query4
+SELECT dept_name, AVG(salary) AS average_salary
+FROM Instructor
+GROUP BY dept_name
+HAVING AVG(salary) > 42000;
+
+-- Query5 
+SELECT name FROM INSTRUCTOR WHERE name NOT IN ('Mozart', 'Einstein');
+-- query6
+SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ANY (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
+-- query7
+SELECT e.name FROM INSTRUCTOR e WHERE e.salary > ALL (SELECT salary FROM INSTRUCTOR WHERE dept_name = 'Biology');
+-- Query8
+SELECT dept_name, AVG(salary) AS avg_salary FROM INSTRUCTOR GROUP BY dept_name HAVING AVG(salary) > 42000; 
+
+
+
+
+-- EXPERIMENT4
+
+-- 1
+select dept_name from instructor group by dept_name
+having sum(salary) > (select avg(total_salary) from (select dept_name, sum(salary) as total_salary from instructor group by dept_name) as dept_salary_avg);
+
+-- 2
+select name,course_id from instructor join teaches on instructor.Id = teaches.Id;
+
+-- 3
+select instructor.name, coalesce(teaches.course_id, 'null') as course_id from instructor left join teaches on instructor.Id = teaches.Id;
+
+-- 4
+create VIEW faculty as select Id, name, dept_name from instructor;
+select *from faculty;
+
+-- 5
+ grant select on faculty to new_user;
+
+
+
+--output:
+
 +-----------------+
 | unique_id_count |
 +-----------------+
@@ -490,6 +437,74 @@ Output:
 | Chemistry | 80000.0000 |
 | Biology   | 66000.0000 |
 +-----------+------------+
+
+
+
+
+-- EXPERIMENT-5
+-- 1
+CREATE VIEW faculty AS
+SELECT ID, name, dept_name
+FROM INSTRUCTOR;
+
+-- 3
+ CREATE ROLE student;
+Query OK, 0 rows affected (0.005 sec)
+
+-- 4
+ GRANT SELECT ON faculty TO student;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 5
+CREATE USER new_user IDENTIFIED BY 'password';
+Query OK, 0 rows affected (0.002 sec)
+
+ GRANT student TO new_user;
+Query OK, 0 rows affected (0.001 sec)
+
+-- 6
+ SELECT * FROM faculty WHERE dept_name = 'Biology';
+
+-- 7
+ REVOKE student FROM new_user;
+Query OK, 0 rows affected (0.001 sec)
+
+-- 8
+ DROP ROLE student;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 9
+ GRANT SELECT ON faculty TO new_user;
+Query OK, 0 rows affected (0.002 sec)
+
+-- 10
+ SELECT * FROM faculty WHERE dept_name = 'Finance';
+
+
+-- 12
+ CREATE TABLE TEACHES2 (
+    ID INTEGER NOT NULL,
+	COURSE_ID VARCHAR(50) NOT NULL,
+	SEC_ID TEXT NOT NULL,
+	SEMESTER CHAR(50) NOT NULL CHECK (SEMESTER IN ('Fall', 'Winter', 'Spring', 'Summer')),
+	YEAR INT NOT NULL,
+	FOREIGN KEY (ID) REFERENCES EMPLOYEE(ID)
+     );
+
+Query OK, 0 rows affected (0.014 sec)
+
+ select * from TEACHES2;
+
+-- 13
+ CREATE INDEX teaches_id_index ON TEACHES(ID);
+Query OK, 0 rows affected (0.022 sec)
+
+-- 14 
+drop index teaches_id_index;
+
+
+
+--output:
 
 +-----------+
 | dept_name |
